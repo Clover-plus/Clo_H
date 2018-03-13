@@ -17,7 +17,7 @@ float Clo_ReLU(float x) {
 	return x > 0 ? (x < 10 ? x : 10) : 0;//max(0,x)&x<10
 }
 
-float ATF_ReLU(float x) {//Rectified linear unitÏßĞÔÕûÁ÷º¯Êı
+float ATF_ReLU(float x) {//Rectified linear unitçº¿æ€§æ•´æµå‡½æ•°
 	return x > 0 ? x : 0;//max(0,x)
 }
 
@@ -26,7 +26,7 @@ float ATF_Sigmoid(float x) {
 }
 #endif
 class Neuront:public _EZNOTE
-{//Ä¬ÈÏfloat
+{//é»˜è®¤float
 	private:
 		float a;
 		
@@ -204,7 +204,7 @@ NeurNet::NeurNet(int len,int lenoflist):_EZNEURNET(1){
 	getp()[0]=NeurList(len,lenoflist);
 }
 NeurList* NeurNet::invite(int N){
-	return &getp()[N-1];//×ÔÈ»±àºÅ(1£¬2£¬3£¬...)
+	return &getp()[N-1];//è‡ªç„¶ç¼–å·(1ï¼Œ2ï¼Œ3ï¼Œ...)
 }
 int NeurNet::addList(int lenoflist){
 	int num=getRC();
@@ -288,7 +288,7 @@ NeurNetEx::NeurNetEx(NeurNetExtable Table) : _EZNEURNETEX(Table.len) {
 		pp[i + 1].row = pp[i].column + 1;//+1 for const a[]
 	}
 	pp[Table.len - 1].column = Table.size[Table.len - 1] / pp[Table.len - 1].row;
-	//³õÊ¼»¯¸÷list
+	//åˆå§‹åŒ–å„list
 	int lenth = 0;
 	for (int i = 0; i < Table.len; ++i) {
 		getp()[i] = NeurListEx(pp[i].row, pp[i].column, &Table.otptC[lenth]);
@@ -296,7 +296,7 @@ NeurNetEx::NeurNetEx(NeurNetExtable Table) : _EZNEURNETEX(Table.len) {
 	}
 }
 NeurListEx* NeurNetEx::invite(int N){
-	return &getp()[N-1];//×ÔÈ»±àºÅ(1£¬2£¬3£¬...)
+	return &getp()[N-1];//è‡ªç„¶ç¼–å·(1ï¼Œ2ï¼Œ3ï¼Œ...)
 }
 int NeurNetEx::addList(int lenoflist){
 	int num=getRC();

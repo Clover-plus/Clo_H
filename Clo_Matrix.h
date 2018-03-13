@@ -59,11 +59,11 @@ Arr Clo_Array<Arr>::operator[](int Subscript){
 /**/
 class int_Clo_Matrix
 {
-	/*°´ĞĞ´æ´¢*/
+	/*æŒ‰è¡Œå­˜å‚¨*/
 	private:
 		int *p;//head
-		int row;//ĞĞÊı
-		int column;//ÁĞÊı
+		int row;//è¡Œæ•°
+		int column;//åˆ—æ•°
 	
 	public:
 		int_Clo_Matrix(int,int);
@@ -109,11 +109,11 @@ int* int_Clo_Matrix::operator[](int SUBN){
 template<class T>
 class Clo_Matrix
 {
-	/*°´ĞĞ´æ´¢*/
+	/*æŒ‰è¡Œå­˜å‚¨*/
 	private:
 		T *p;//head
-		int row;//ĞĞÊı
-		int column;//ÁĞÊı
+		int row;//è¡Œæ•°
+		int column;//åˆ—æ•°
 	
 	protected:
 		int getRC(int=TYPEROW);
@@ -121,17 +121,17 @@ class Clo_Matrix
 		int setp(T*,int);//not recommand
 		int setp(T*,int,int);
 	public:
-		Clo_Matrix(int=1);//0ÏòÁ¿£¨ÁĞ£©
-		Clo_Matrix(int,int);//0¾ØÕó
-		Clo_Matrix(T* H,int);//´´½¨ÁĞÏòÁ¿
+		Clo_Matrix(int=1);//0å‘é‡ï¼ˆåˆ—ï¼‰
+		Clo_Matrix(int,int);//0çŸ©é˜µ
+		Clo_Matrix(T* H,int);//åˆ›å»ºåˆ—å‘é‡
 		Clo_Matrix(T* H,int,int);
 		Clo_Matrix(Clo_Matrix&);
 		~Clo_Matrix();
 		void deletep();
 		int renewp(int,int*);
 		int display(DISPLAYMETHOD=METHOD_ROW);
-		int Rotate(double,int,int);//rotateĞı×ª
-		Clo_Matrix transpos();//transposition×ªÖÃ
+		int Rotate(double,int,int);//rotateæ—‹è½¬
+		Clo_Matrix transpos();//transpositionè½¬ç½®
 		T*& getp();
 		Clo_Matrix<T> addRC(int=1,T=0,int=ADD_ROW);//only support <int><unsigned><float><double><etc.>
 		Clo_Matrix<T> Activate(T ACTF(T));

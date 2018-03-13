@@ -6,9 +6,9 @@
 #define GARWARRF float
 #define GARWARRL long
 
-//¶ÁBMPÎÄ¼ş
+//è¯»BMPæ–‡ä»¶
 int openbmpfile(FILE *&p, char *filename) {
-	char *name = new char[100];//²»Ö§³ÖÌØ±ğ³¤µÄÎÄ¼şÃû;
+	char *name = new char[100];//ä¸æ”¯æŒç‰¹åˆ«é•¿çš„æ–‡ä»¶å;
 	int i = 0;
 	strcpy(name, filename);
 	strcat(name, ".bmp");
@@ -20,14 +20,14 @@ int openbmpfile(FILE *&p, char *filename) {
 	return 0;
 }
 
-//¶ÁÎÄ¼şÍ·
+//è¯»æ–‡ä»¶å¤´
 BITMAPFILEHEADER readBMPhead(FILE* &p){
 	BITMAPFILEHEADER header;
 	fread(&header,sizeof(BITMAPFILEHEADER),1,p);
 	return header;
 }
 
-//¶ÁÎ»Í¼ĞÅÏ¢Í·
+//è¯»ä½å›¾ä¿¡æ¯å¤´
 BITMAPINFOHEADER readBMPIIhead(FILE* &p){
 	BITMAPINFOHEADER header;
 	fread(&header,sizeof(BITMAPINFOHEADER),1,p);
@@ -38,17 +38,17 @@ DWORD readOffBits(BITMAPFILEHEADER A){
 	return A.bfOffBits;
 }
 
-//»ñÈ¡ÎÄ¼şÏñËØ(1,4,8,16,24,32)
+//è·å–æ–‡ä»¶åƒç´ (1,4,8,16,24,32)
 WORD readBitCount(BITMAPINFOHEADER A){
 	return A.biBitCount;
 }
 
-//»ñÈ¡ÎÄ¼ş¿í¶È
+//è·å–æ–‡ä»¶å®½åº¦
 LONG readWidth(BITMAPINFOHEADER A){
 	return A.biWidth;
 }
 
-//»ñÈ¡ÎÄ¼ş¸ß¶È
+//è·å–æ–‡ä»¶é«˜åº¦
 LONG readHeight(BITMAPINFOHEADER A){
 	return A.biHeight;
 }
@@ -66,8 +66,8 @@ EZCBGR readEZCBGR(FILE *&p){
 	fread(&I, sizeof(EZCBGR), 1, p);
 	return I;
 }
-//RGB×ª»Ò¶È
-//´Ë»Ò¶ÈÓëÔ­ÏàÏà·´£¬ĞèÒª255-x×ª»».
+//RGBè½¬ç°åº¦
+//æ­¤ç°åº¦ä¸åŸç›¸ç›¸åï¼Œéœ€è¦255-xè½¬æ¢.
 long RGBtoGaryL(EZCBGR I){
 	return (I.R*299+I.G*587+I.B*114+500)/1000;
 }
