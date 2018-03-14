@@ -340,7 +340,7 @@ uint CombinNumber(uint m, uint n){
 		|     |
 		\  n  /
 	*/
-	uitn a=1;
+	uint a=1;
 	for(uint i=0;i<m;++i)a*=n-i;
 	return a/factorial(m);
 }
@@ -357,7 +357,7 @@ int LucasTheorem(uint m, uint n, uint p){
 			return (int)CombinNumber(m,n);
 		}
 		else {
-			return LucasTheorem(m/p,n/p)+(int)CombinNumber(m%p,n%p);
+			return LucasTheorem(m/p,n/p,p)+(int)CombinNumber(m%p,n%p);
 		}
 	}
 	else return -1;//error_p_is_not_prime
