@@ -317,7 +317,7 @@ int* Euclidgcd(uint a, uint b) {
 			x = A[0];
 			y = A[1];
 			A[0] = y;
-			A[1] = x - y*b / a;
+			A[1] = x - y*(int)(b / a);
 			return A;
 		}
 	}
