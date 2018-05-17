@@ -5,6 +5,7 @@
 #define Clo_PI 3.1415926535897932384626433832795
 #include<time.h>
 #include<stdlib.h>
+#include<stdio.h>
 
 #ifndef uint
 #define uint unsigned int
