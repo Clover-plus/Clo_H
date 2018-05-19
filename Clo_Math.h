@@ -6,6 +6,7 @@
 #include<time.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<math.h>
 
 #ifndef uint
 #define uint unsigned int
@@ -364,5 +365,39 @@ int LucasTheorem(uint m, uint n, uint p){
 	else return -1;//error_p_is_not_prime
 }
 
+int ModExp(int a,int e, int m){
+    int temp = 0;
+    if( e == 0 ) return 1;
+    else if ( e == 1) return a%m;
+    else if ( e % 2 ){
+        temp = ModExp(a, e>>1, m);
+        temp = temp*temp % m;
+        return temp*a % m;
+    }
+    else {
+        //e%2 == 0
+        temp = ModExp(a, e/2 , m);
+        return temp*temp % m;
+    }
+}
+
+int PrimeTest(int a){
+    int *table;
+    int tempindex = (int)sqrt(a) + 1;
+    table = new int[tempindex];
+    if( a < 2 ) return 0;
+    //int table
+    for( int i = 2; i < tempindex; ++i) table[i] = 1;
+    //end int
+    for( int i = 2; i < tempindex; ++i){
+        if( table[i] == 1){
+            if( a%i == 0 ) return 0;//a is not prime.
+            for( int i1 = 2; i1*i <tempindex; ++i1){
+                table[i*i1] == 0;
+            }
+        }//end if
+    }
+    return 1;//a is prime.
+}
 #endif /*Clo_PI*/
 #endif /*Clo_Math_H_*/
