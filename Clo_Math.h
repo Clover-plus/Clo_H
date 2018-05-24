@@ -11,25 +11,25 @@
 #ifndef uint
 #define uint unsigned int
 #endif
-/*
-const unsigned int P = 1280023;
-static unsigned int RAND_X;
-template<class T>T Clo_ABS(T x);
+
+const unsigned int P = 4294967295;
+static unsigned int RAND_X = 1;
 
 
 void SETSEED(unsigned int L) {
-	RAND_X = L%P;
+	RAND_X = L*16807 % P;
 }
 
-double Rand_ALL()//0-1,difnum~~640000
+uint Rand_ALL()
 {
-	RAND_X = P - Clo_ABS<unsigned int>(P - 2 * RAND_X);
-	return (double)RAND_X / P;
+	RAND_X = RAND_X*RAND_X % P;
+	return RAND_X;
 }
+
 int RandInt(int i, int j) {
 	return (int)(Rand_ALL()*(j - i + 1) + i);
 }
-*/
+
 void blank() {
 	printf("\n");
 }
