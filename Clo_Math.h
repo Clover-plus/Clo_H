@@ -12,17 +12,49 @@
 #define uint unsigned int
 #endif
 
-const unsigned int P = 4294967295;
+#define BBSFlag_last 1
+#define BBSFlag_odd 2
+#define BBSFlag_even 3
+const unsigned int PFORUINT = 4294967295;
 static unsigned int RAND_X = 1;
+static unsigned int BBSNext = 101355;
 
+int UintOdd() {
+	int k = 0;
+	unsigned int temp = BBSNext;
+	while (temp) {
+		temp/=2;
+		if(temp&0x00000001)k=1-k;
+	}
+	return k;
+}
+
+uint BBSRandFunction(int f) {
+	BBSNext = BBSNext*BBSNext % 192649;//383 * 503
+	switch (f) {
+		case BBSFlag_last: {
+			return BBSNext&0x00000001;
+			break;
+		}
+		case BBSFlag_odd: {
+			return UintOdd();
+			break;
+		}
+		case BBSFlag_even: {
+			return 1-UintOdd();//!UintOdd();
+			break;
+		}
+		default : return BBSNext&0x00000001;
+	}
+}
 
 void SETSEED(unsigned int L) {
-	RAND_X = L*16807 % P;
+	RAND_X = L*16807 % PFORUINT;
 }
 
 uint Rand_ALL()
 {
-	RAND_X = RAND_X*RAND_X % P;
+	RAND_X = RAND_X*RAND_X % PFORUINT;
 	return RAND_X;
 }
 
@@ -49,6 +81,7 @@ template<class T>
 T Clo_ABS(T x){
 	return x>0?x:0-x;
 }
+
 unsigned int factorial(int n){
 	unsigned int temp=1;
 	for(int i=1;i<=n;++i){
