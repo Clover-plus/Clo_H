@@ -142,8 +142,11 @@ char InttoChar(int _int){
 }
 
 int C_Ceil(int Ua,int Ub){
-	/*untested while Ua or Ub is negitive*/
-	return Ua%Ub==0?Ua/Ub:Ua/Ub+1;
+	return (Ua+Ub-1)/Ub;
+}
+
+uint C_Ceil(uint Ua,uint Ub){
+	return (Ua+Ub-1)/Ub;
 }
 
 int longerfinger(int a,int b){
