@@ -990,10 +990,8 @@ LongInt LongInt::operator/(LongInt I) {
 		temp->next = NULL;
 		P->tail = temp;
 		ZeroClearArry(P);
-		return P;
+		return P;//LongInt(P) is hidden.
 	}
-	//MeasureIntArry(P));
-	//return LongInt(P);
 }
 
 LongInt LongInt::operator%(LongInt I) {
