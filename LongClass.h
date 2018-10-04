@@ -6,6 +6,7 @@
 #ifndef LonGclass_H
 #define LonGclass_H
 #include <stdio.h>
+#include <cstring>
 
 /*int_16:0~32767*/
 /*unsigned int_16:0~65535*/
@@ -282,7 +283,7 @@ void MeasureIntArry(INTARRY* P) {
 void ZeroClearArry(INTARRY* P) {
 	/*clear the zero over the top*/
 	IntNote *temp = P->tail;
-	while (temp != P->head&&temp->n == 0) {
+	while (temp->prev != P->head&&temp->n == 0) {
 		temp->next = NULL;//Necessary
 		temp = temp->prev;
 		delete temp->next;
@@ -301,6 +302,7 @@ class LongInt
 		LongInt();
 		LongInt(int);
 		LongInt(char*,int);
+		LongInt(const char*,int);
 		LongInt(INTARRY*,int);
 		LongInt(IntNote*, uint, uint);
 		LongInt(const LongInt&);
@@ -310,11 +312,20 @@ class LongInt
 		IntNote* visit(uint subs);//untested
 		int vTop();
 		int SetExp(uint);
-		friend LongInt LIAddition(LongInt F, LongInt N);
-		LongInt& operator=(LongInt&);
-		LongInt operator+(LongInt&);
-		LongInt operator-(LongInt&);
-		LongInt operator*(LongInt&);
+		int isZero();
+		int isOne();
+		friend LongInt LIAddition(LongInt, LongInt);
+		friend LongInt LIDes(LongInt, LongInt);
+		friend LongInt LIDivision2(LongInt);
+		friend LongInt LIModExp(LongInt,LongInt,LongInt);
+		LongInt& operator=(const LongInt&);
+		LongInt operator+(LongInt);
+		LongInt operator-(LongInt);
+		LongInt operator*(LongInt);
+		LongInt operator/(LongInt);
+		LongInt operator%(LongInt);
+		int operator>(LongInt);
+		int operator<(LongInt);
 };
 
 LongInt::LongInt(){
@@ -331,6 +342,15 @@ LongInt::LongInt(char* Num,int Length=0){
 	/*It's important to have the Length so that function can be surely endable*/
 	if(Length==0)Length=C_strlen(Num);//addition
 	p=NewIntArry(Num,Length);
+}
+
+LongInt::LongInt(const char* Num,int Length=0){
+	/*It's important to have the Length so that function can be surely endable*/
+	if(Length==0)Length=strlen(Num);//addition
+	char *CH = new char[Length];
+	memcpy(CH,Num,Length);
+	p=NewIntArry(CH,Length);
+	delete[] CH;
 }
 
 LongInt::LongInt(INTARRY* P,int tp=TP_DEFAULT){
@@ -462,12 +482,21 @@ IntNote* LongInt::visit(uint subs) {
 
 int LongInt::vTop() {
 	int temp = EXPPNOTE*p->length - p->digits;
-	return p->tail->n / C_EXP10(temp);
+	if (temp == 9)return 0;
+	else return p->tail->n / C_EXP10(8-temp);
 }
 
 int LongInt::SetExp(uint N) {
 	this->p->head->n = N;
 	return 0;
+}
+
+int LongInt::isZero() {
+	return p->tail->n==0;
+}
+
+int LongInt::isOne() {
+	return p->tail->n==1 && p->length==1;
 }
 
 LongInt LIAddition(LongInt F, LongInt N)
@@ -552,16 +581,130 @@ LongInt LIAddition(LongInt F, LongInt N)
 	}
 	temp->next = NULL;/*tag for tail*/
 	P->tail = temp;
+	ZeroClearArry(P);
+	return LongInt(P);
+}
+
+LongInt LIDes(LongInt F, LongInt N)
+{
+	/*This is only work while A is bigger than B in A-B*/
+	INTARRY* P = new IntNoteArray;
+	int mlen = F.p->length >= N.p->length;
+	int minlen = mlen ? N.p->length : F.p->length;
+	IntNote *temp, *temp1, *temp2;
+	int mark = 0;
+	temp = new IntNote;
+	P->head = temp;
+	temp->prev = NULL;/*blank*/
+	temp->n = 0;/*lag*/
+	temp1 = F.p->head;
+	temp2 = N.p->head;
+	for (int i = 0; i<minlen; ++i) {
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp1 = temp1->next;
+		temp2 = temp2->next;
+		temp->n = temp1->n + MAX_INT_NOTE_PLUS - temp2->n;
+		if (temp->n>MAX_INT_NOTE_PLUS) {
+			temp->n = temp->n - MAX_INT_NOTE_PLUS - mark;
+			mark = 0;
+		}
+		else {
+			if (temp->n == MAX_INT_NOTE_PLUS) {
+				if (mark)temp->n = MAX_INT_NOTE;
+				else temp->n = 0;
+				//keep the mark const here
+			}
+			else {
+				temp->n -= mark;
+				mark = 1;
+			}
+		}
+	}
+	
+	if (!mlen){temp1 = temp2;P->head->n=355;}//355 here is an setted number
+	else if(N.p->length == F.p->length && mark)P->head->n=355;
+	while (mark&&temp1->next != NULL) {
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp1 = temp1->next;
+		if (temp1->n) {
+			temp->n = temp1->n - 1;
+			mark = 0;
+		}
+		else {
+			//bug
+			temp->n = MAX_INT_NOTE;
+			//mark = 1;
+		}
+	}
+	while (temp1->next != NULL) {
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp1 = temp1->next;
+		temp->n = temp1->n;
+	}
+	temp->next = NULL;/*tag for tail*/
+	P->tail = temp;
+	ZeroClearArry(P);
+	//MeasureIntArry(P);
+	return LongInt(P);
+}
+
+LongInt LIDivision2(LongInt I) {
+	INTARRY* P=new IntNoteArray;
+	IntNote *temp,*temp1;
+	int mark = 0,tmark=0,imark=0;
+	temp = new IntNote;
+	temp1 = I.p->tail;
+	//set tail
+	temp->next = NULL;
+	P->tail = temp;
+	for (int i = 0; i<I.p->length; ++i) {
+		tmark = mark? (temp1->n + MAX_INT_NOTE_PLUS) : temp1->n;
+		temp->n = tmark>>1;
+		mark = 0x01 & tmark;
+		if (temp->n!=0 || imark!=0){
+			imark = 1;
+			temp->prev = new IntNote;
+			temp->prev->next = temp;
+			temp = temp->prev;
+		}
+		temp1 = temp1->prev;
+	}
+	//set head
+	temp->prev = NULL;
+	temp->n = 0;
+	P->head = temp;
 	MeasureIntArry(P);
 	return LongInt(P);
 }
 
-LongInt& LongInt::operator=(LongInt &I) {
+LongInt LIModExp(LongInt A, LongInt E, LongInt M) {
+	LongInt temp;
+    if( E.isZero() ) return 1;
+    else if ( E.isOne() ) return A%M;
+    else if ( E.p->head->n & 0x01 ){
+        temp = LIModExp(A, LIDivision2(E), M);
+        temp = temp*temp % M;
+        return temp*A % M;
+    }
+    else {
+        //e%2 == 0
+        temp = LIModExp(A, LIDivision2(E) , M);
+        return temp*temp % M;
+    }
+}
+
+LongInt& LongInt::operator=(const LongInt &I) {
 	this->p = NewIntArry(I.p);
 	return *this;
 }
 
-LongInt LongInt::operator+(LongInt &I){
+LongInt LongInt::operator+(LongInt I){
 	INTARRY* P=new IntNoteArray;
 	int mlen=longerfingeru(this->p->length,I.p->length);
 	int minlen=mlen?I.p->length:this->p->length;
@@ -619,7 +762,7 @@ LongInt LongInt::operator+(LongInt &I){
 	return LongInt(P);
 }
 
-LongInt LongInt::operator-(LongInt &I) {
+LongInt LongInt::operator-(LongInt I) {
 	/*This is only work while A is bigger than B in A-B*/
 	INTARRY* P = new IntNoteArray;
 	int mlen = longerfingeru(this->p->length, I.p->length);
@@ -666,7 +809,7 @@ LongInt LongInt::operator-(LongInt &I) {
 			mark = 0;
 		}
 		else {
-			//bug
+			//bug //bug?
 			temp->n = MAX_INT_NOTE;
 			//mark = 1;
 		}
@@ -685,7 +828,7 @@ LongInt LongInt::operator-(LongInt &I) {
 	return LongInt(P);
 }
 
-LongInt LongInt::operator*(LongInt &I){
+LongInt LongInt::operator*(LongInt I){
 	int mlen = longerfingeru(this->p->length, I.p->length);
 	uint maxlen, minlen, halflen;
 	IntNoteArray *temp1, *temp2;
@@ -767,7 +910,7 @@ LongInt LongInt::operator*(LongInt &I){
 #endif
 		Z0=A0*B0;
 		Z1=A1*B1;
-		Z2=(A0+A1)*(B0+B1)-(Z0+Z1);//at here the exp of Z2 is 0 which is ought to be '£¿'
+		Z2=(A0+A1)*(B0+B1)-(Z0+Z1);//at here the exp of Z2 is 0 which is ought to be 'ï¿½ï¿½'
 		Z2.SetExp(halflen+temp1->head->n+temp2->head->n);//here halflen+?
 #ifdef TEST
 		blank();
@@ -784,6 +927,86 @@ LongInt LongInt::operator*(LongInt &I){
 		return LIAddition(LIAddition(Z0, Z1), Z2);
 	}
 	//may be unfinished
+}
+
+LongInt LongInt::operator/(LongInt I) {
+	INTARRY* P = new IntNoteArray;
+	LongInt LIP1,LIP2;
+	int tmark = 0;
+	int mlen = longerfingeru(this->p->length, I.p->length);
+	//int minlen = mlen ? I.p->length : this->p->length;
+	int exponents = mlen ? this->p->length - I.p->length : I.p->length - this->p->length;
+	IntNote *temp, *temp1, *temp2;
+	temp = new IntNote;
+	P->head = temp;
+	//P->length = exponents;
+	temp->prev = NULL;/*blank*/
+	temp->n = 0;/*lag*/
+	temp1 = this->p->tail;
+	temp2 = I.p->tail;
+	for (int i = 0; i<exponents; ++i) {//fill Zero number
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp->n = 0;
+	}
+	if(*this>I){
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp->n = 1 + temp1->n/temp2->n;
+		temp->next = NULL;
+		P->tail = temp;
+		MeasureIntArry(P);
+		LIP1 = LongInt(P);// LIP1 * I > *THIS
+		LIP2 = LIDivision2(LIP1);
+		LIP1 = LIP2;
+		while(tmark==0 && LIP1.p->tail->n){
+			LIP1 = LIDivision2(LIP1);
+			if(*this>(LIP2*I)){
+				LIP2 = LIP2 + LIP1;
+			}
+			else if(*this<(LIP2*I)){
+				if(LIP1.vTop())LIP2 = LIP2 - LIP1;
+				else LIP2 = LIP2 - LongInt("1");
+				// //
+				// LIP1.Display();
+				// blank();
+				// (LIP2*I).Display();
+				// blank();
+				// //
+			}
+			else {
+				tmark = 1;
+			}
+		}
+		return LIP2;
+	}
+	else {
+		temp->next = new IntNote;
+		temp->next->prev = temp;
+		temp = temp->next;
+		temp->n = 0;
+		temp->next = NULL;
+		P->tail = temp;
+		ZeroClearArry(P);
+		return P;
+	}
+	//MeasureIntArry(P));
+	//return LongInt(P);
+}
+
+LongInt LongInt::operator%(LongInt I) {
+	return *this - I * (*this / I);
+}
+
+int LongInt::operator>(LongInt I) {
+	LongInt A = LIDes(*this,I);
+	return A.p->head->n!=355 && A.p->tail->n!=0;
+}
+
+int LongInt::operator<(LongInt I) {
+	return LIDes(*this,I).p->head->n==355;
 }
 
 #endif/*longclass_h*/

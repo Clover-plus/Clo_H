@@ -172,6 +172,14 @@ unsigned int C_strlen(char * a){
 	return k;
 }
 
+unsigned int C_strlen(const char * a){//untested
+	unsigned int k=0;
+	while(*(a+k)!='\0'){
+		++k;
+	}
+	return k;
+}
+
 
 //InvSqrt && CarmSqrt have not been fully tested by myself yet.
 //BTW it's not accurate; it's nearly number. However, it's fast.
