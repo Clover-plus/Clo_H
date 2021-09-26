@@ -15,7 +15,10 @@
 #define BBSFlag_last 1
 #define BBSFlag_odd 2
 #define BBSFlag_even 3
-const unsigned int PFORUINT = 4294967295;
+#define BBSFLAG BBSFlag_odd
+const unsigned int PFORUINT = 4214184975;//3^7*5^2*7^2*11^2*13
+const unsigned int MODADDM = 15016;//(3*5*7*11*13)+1
+const unsigned int MODADDC = 2;//(c,m)=1
 static unsigned int RAND_X = 1;
 static unsigned int BBSNext = 101355;
 
@@ -48,14 +51,22 @@ uint BBSRandFunction(int f) {
 	}
 }
 
+unsigned int BBSRand(){
+    return BBSRandFunction(BBSFLAG);
+}
+
 void SETSEED(unsigned int L) {
-	RAND_X = L*16807 % PFORUINT;
+	RAND_X = (unsigned long long)L*MODADDM % PFORUINT;
 }
 
 uint Rand_ALL()
 {
-	RAND_X = RAND_X*RAND_X % PFORUINT;
+	RAND_X = ((unsigned long long)RAND_X*MODADDM+ MODADDC)% PFORUINT;
 	return RAND_X;
+}
+
+unsigned int LCGRand(){
+    return Rand_ALL();
 }
 
 int RandInt(int i, int j) {
@@ -334,9 +345,12 @@ unsigned int MillerRabinTest(uint n) {
 	}
 }
 
-uint gcd(uint a, uint b) {
+int gcd(int a, int b) {
 	/*greatest common divisor*/
 	/*Euclid*/
+	if(a<0)a=0-a;
+	if(b<0)b=0-b;
+	if(a==0||b==0)return 0;
 	if (a&&b) {
 		if (b%a == b)return a%b ? gcd(b, a%b) : b;
 		else return b%a ? gcd(a, b%a) : a;
@@ -349,25 +363,12 @@ int* Euclidgcd(uint a, uint b) {
 	int *A;
 	int x, y;
 	if (a&&b) {
-		if (b%a == b) {
-			//a > b
 			A = Euclidgcd(b, a%b);
-			//unfinished
 			x = A[0];
 			y = A[1];
 			A[0] = y;
 			A[1] = x - y*(int)(a / b);
 			return A;
-		}
-		else {
-			//a <= b
-			A = Euclidgcd(a, b%a);
-			x = A[0];
-			y = A[1];
-			A[0] = y;
-			A[1] = x - y*(int)(b / a);
-			return A;
-		}
 	}
 	else {
 		int *A0 = new int[2];//delete later
@@ -375,6 +376,20 @@ int* Euclidgcd(uint a, uint b) {
 		A0[1] = 0;
 		return A0;
 	}
+}
+
+void EuclidFunction(int a,int b, int A[2]){
+	int* p;
+	if(gcd(a,b)==1){
+		p = Euclidgcd(a>0?a:-a,b>0?b:-b);
+		A[0]=(a>0?1:-1)* *p;
+		A[1]=(b>0?1:-1)* *(p+1);
+		delete[] p;
+	}
+	else {
+		A[0] = 0;A[1] = 0;
+	}
+    return;
 }
 
 uint lcm(uint a, uint b) {
