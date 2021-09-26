@@ -409,19 +409,20 @@ int LucasTheorem(uint m, uint n, uint p){
 	else return -1;//error_p_is_not_prime
 }
 
-int ModExp(int a,int e, int m){
-    int temp = 0;
+unsigned int ModExp(unsigned int a, unsigned int e, unsigned int m){
+    unsigned int temp = 0;
+    if( m == 0 ) return 0;
     if( e == 0 ) return 1;
     else if ( e == 1) return a%m;
     else if ( e % 2 ){
         temp = ModExp(a, e>>1, m);
-        temp = temp*temp % m;
-        return temp*a % m;
+        temp = (unsigned long long)temp*temp % m;
+        return (unsigned long long)temp*a % m;
     }
     else {
         //e%2 == 0
         temp = ModExp(a, e/2 , m);
-        return temp*temp % m;
+        return (unsigned long long)temp*temp % m;
     }
 }
 
