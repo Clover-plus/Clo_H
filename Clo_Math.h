@@ -300,32 +300,34 @@ uint LongUint::operator%(uint m) {
 //if n < 2,047, it is enough to test a = 2
 //if n < 4,759,123,141, it is enough to test a = 2, 7, and 61
 
-int MillerRabinTest(uint a, uint q, uint k, uint p) {
+unsigned int MillerRabinTest_ex(uint a, uint q, uint k, uint p) {
 	//p=n
 	//p-1=2^k*q
 	uint temp=a;
 	uint pm = p - 1;
-	for (uint i = 1; i < q; ++i)temp = LongUint(temp, a) % p;//q-1 times, as temp==a at first.
+	for (uint i = 1; i < q; ++i)temp = (unsigned long long)(temp * a) % p;//q-1 times, as temp==a at first.
 	if (temp == 1)return 1;//uncertain
-	for (uint i = 1; i < k&&temp != pm; ++i)temp = LongUint(temp, temp) % p;//k-1 times
+	for (uint i = 1; i < k&&temp != pm; ++i)temp = (unsigned long long)(temp * temp) % p;//k-1 times
 	return temp == pm ? 1 : 0;
 }
 
-int MR_is_prime(uint n) {
+#define MR_is_prime(...) MillerRabinTest(__VA_ARGS__)
+unsigned int MillerRabinTest(uint n) {
 	//return 1 when n is prime
 	//return 0 when n is not prime
 	uint i = 1;
+	if (n==0||n==1) return 0;//0 and 1 are not prime
 	if ((n & 0x00000001) == 0)return n==2?1:0;//even. not prime, of cause.(except 2)
 	uint N = n >> 1;
 	while ((N & 0x00000001) == 0) {
 		N >>= 1;
 		++i;
 	}
-	if (N < 2047)return MillerRabinTest(2, N, i, n);
+	if (N < 2047)return MillerRabinTest_ex(2, N, i, n);
 	else {
-		if (MillerRabinTest(2, N, i, n)) {
-			if (MillerRabinTest(7, N, i, n)) {
-				return MillerRabinTest(61, N, i, n);
+		if (MillerRabinTest_ex(2, N, i, n)) {
+			if (MillerRabinTest_ex(7, N, i, n)) {
+				return MillerRabinTest_ex(61, N, i, n);
 			}
 		}
 		return 0;
@@ -426,7 +428,7 @@ unsigned int ModExp(unsigned int a, unsigned int e, unsigned int m){
     }
 }
 
-int PrimeTest(int a){
+unsigned int PrimeTest(unsigned int a){
     int *table;
     int tempindex = (int)sqrt(a) + 1;
     table = new int[tempindex];
@@ -436,12 +438,16 @@ int PrimeTest(int a){
     //end int
     for( int i = 2; i < tempindex; ++i){
         if( table[i] == 1){
-            if( a%i == 0 ) return 0;//a is not prime.
+            if( a%i == 0 ){
+				delete[] table;
+				return 0;//a is not prime.
+			}
             for( int i1 = 2; i1*i <tempindex; ++i1){
                 table[i*i1] == 0;
             }
         }//end if
     }
+	delete[] table;
     return 1;//a is prime.
 }
 #endif /*Clo_PI*/
