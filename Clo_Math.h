@@ -378,6 +378,33 @@ int* Euclidgcd(uint a, uint b) {
 	}
 }
 
+int Euclidgcd_ex(int a, int b, int &x, int &y){
+	/*xa+yb=gcd(a,b)*/
+	x = 1;
+	y = 0;
+	int xt = 0;
+	int yt = 1;
+	int tmp,t;
+	while(b){
+		t = a / b;
+		//
+		tmp = x - xt * t;
+		x = xt;
+		xt = tmp;
+		//
+		tmp = y - yt * t;
+		y = yt;
+		yt = tmp;
+		//
+		tmp = a % b;
+		a = b;
+		b = tmp;
+	}
+	x=a*x;
+	y=a*y;
+	return 0;
+}
+
 void EuclidFunction(int a,int b, int A[2]){
 	int* p;
 	if(gcd(a,b)==1){
@@ -441,6 +468,19 @@ unsigned int ModExp(unsigned int a, unsigned int e, unsigned int m){
         temp = ModExp(a, e/2 , m);
         return (unsigned long long)temp*temp % m;
     }
+}
+
+unsigned int ModExp_ex(unsigned int a, unsigned int e, unsigned int m){
+	if( m == 0 ) return 0;
+    if( e == 0 ) return 1;
+	else if ( e == 1) return a%m;
+    unsigned int r = 1, t = a % m;
+    while(e) {
+    	if (e & 1) r = (r * t) % m;
+		t = (t * t) % m;
+		e >>= 1;
+    }
+	return r;
 }
 
 unsigned int PrimeTest(unsigned int a){
